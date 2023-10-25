@@ -100,11 +100,12 @@ class NeRFSystem(LightningModule):
             kwargs['img_downscale'] = self.hparams.img_downscale
             kwargs['val_num'] = self.hparams.num_gpus
             kwargs['use_cache'] = self.hparams.use_cache
-        elif self.hparams.dataset_name == 'blender':
+        elif self.hparams.dataset_name == 'blender' or self.hparams.dataset_name == 'evdata':
             kwargs['img_wh'] = tuple(self.hparams.img_wh)
             kwargs['perturbation'] = self.hparams.data_perturb
         self.train_dataset = dataset(split='train', **kwargs)
         self.val_dataset = dataset(split='val', **kwargs)
+        print("Dataset: ", self.hparams.dataset_name)
 
     def configure_optimizers(self):
         self.optimizer = get_optimizer(self.hparams, self.models_to_train)
