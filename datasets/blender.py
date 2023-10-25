@@ -40,15 +40,17 @@ class BlenderDataset(Dataset):
 
         assert set(perturbation).issubset({"color", "occ"}), \
             'Only "color" and "occ" perturbations are supported!'
+        
         self.perturbation = perturbation
+        
         if self.split == 'train':
             print(f'add {self.perturbation} perturbation!')
+        
         self.read_meta()
         self.white_back = True
 
     def read_meta(self):
-        with open(os.path.join(self.root_dir,
-                               f"transforms_{self.split.split('_')[-1]}.json"), 'r') as f:
+        with open(os.path.join(self.root_dir, f"transforms_{self.split.split('_')[-1]}.json"), 'r') as f:
             self.meta = json.load(f)
 
         w, h = self.img_wh

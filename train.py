@@ -127,21 +127,29 @@ class NeRFSystem(LightningModule):
                           pin_memory=True)
     
     def training_step(self, batch, batch_nb):
+
         rays, rgbs, ts = batch['rays'], batch['rgbs'], batch['ts']
         results = self(rays, ts)
+
+        print("1")
         loss_d = self.loss(results, rgbs)
         loss = sum(l for l in loss_d.values())
-
+        
+        print("2", loss)
         with torch.no_grad():
             typ = 'fine' if 'rgb_fine' in results else 'coarse'
             psnr_ = psnr(results[f'rgb_{typ}'], rgbs)
 
+        print("3")
         self.log('lr', get_learning_rate(self.optimizer))
         self.log('train/loss', loss)
+        
+        print("4", loss_d)
         for k, v in loss_d.items():
             self.log(f'train/{k}', v, prog_bar=True)
         self.log('train/psnr', psnr_, prog_bar=True)
 
+        print("Loss:", loss)
         return loss
 
     def validation_step(self, batch, batch_nb):
@@ -204,7 +212,7 @@ def main(hparams):
                       progress_bar_refresh_rate=hparams.refresh_every,
                       gpus=hparams.num_gpus,
                       accelerator='ddp' if hparams.num_gpus>1 else None,
-                      num_sanity_val_steps=1,
+                      num_sanity_val_steps=0,
                       benchmark=True,
                       profiler="simple" if hparams.num_gpus==1 else None)
 
